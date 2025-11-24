@@ -1,81 +1,118 @@
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pengumpulan Tugas Online</title>
-<style>
-  body { font-family: Arial, sans-serif; background: #f5f5f5; padding: 20px; }
-  .box { max-width: 500px; background: white; margin: auto; padding: 20px; border-radius: 10px; }
-  input, select, textarea { width: 100%; padding: 10px; margin-top: 10px; }
-  button { margin-top: 15px; padding: 12px; width: 100%; background: #0069c0; color: white; border: none; border-radius: 5px; }
-  button:hover { background: #004c8c; cursor: pointer; }
-</style>
+<title>Tugas Harian Siswa</title>
+<script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
 
-<div class="box">
-  <h2>Form Pengumpulan Tugas</h2>
+<body class="bg-gray-100">
 
-  <form id="taskForm">
-    <label>Nama Siswa</label>
-    <input type="text" id="nama" required>
+<div class="max-w-md mx-auto mt-6 bg-white shadow-xl rounded-xl p-6">
 
-    <label>Kelas</label>
-    <select id="kelas" required>
-      <option value="7">Kelas 7</option>
-      <option value="8">Kelas 8</option>
-      <option value="9">Kelas 9</option>
-    </select>
+  <h2 class="text-2xl font-bold text-center mb-4 text-blue-700">Tugas Harian Siswa</h2>
 
-    <label>Jenis Tugas</label>
-    <select id="jenis" required>
-      <option>Murajaah Tahfizh</option>
-      <option>Murajaah Mapel Diniyyah</option>
-      <option>Murajaah Mapel Umum</option>
-      <option>Membantu Orangtua</option>
-    </select>
+  <form id="taskForm" class="space-y-3">
+    
+    <div>
+      <label class="font-semibold">Nama Siswa</label>
+      <input id="nama" type="text" required 
+        class="w-full border rounded-lg p-2 mt-1 focus:ring focus:ring-blue-300">
+    </div>
 
-    <label>Deskripsi Tugas</label>
-    <textarea id="deskripsi" rows="4" required></textarea>
+    <div>
+      <label class="font-semibold">Kelas</label>
+      <select id="kelas" required 
+        class="w-full border rounded-lg p-2 mt-1 focus:ring focus:ring-blue-300">
+        <option value="7">Kelas 7</option>
+        <option value="8">Kelas 8</option>
+        <option value="9">Kelas 9</option>
+      </select>
+    </div>
 
-    <button type="submit">Kumpulkan Tugas</button>
+    <div>
+      <label class="font-semibold">Jenis Tugas</label>
+      <select id="jenis" required 
+        class="w-full border rounded-lg p-2 mt-1 focus:ring focus:ring-blue-300">
+        <option>Murajaah Tahfizh</option>
+        <option>Murajaah Mapel Diniyyah</option>
+        <option>Murajaah Mapel Umum</option>
+        <option>Membantu Orangtua</option>
+      </select>
+    </div>
+
+    <div>
+      <label class="font-semibold">Deskripsi Tugas</label>
+      <textarea id="deskripsi" rows="3" required 
+        class="w-full border rounded-lg p-2 mt-1 focus:ring focus:ring-blue-300"></textarea>
+    </div>
+
+    <button type="submit" 
+      class="w-full bg-blue-600 text-white p-3 rounded-lg font-semibold hover:bg-blue-700 transition">
+      Simpan Tugas
+    </button>
+
   </form>
 
-  <p id="status"></p>
+  <h3 class="text-xl font-bold mt-6 mb-2">Tugas Tersimpan</h3>
+  <div id="taskList" class="space-y-3"></div>
+
 </div>
 
 <script>
+// load data
+document.addEventListener("DOMContentLoaded", loadTasks);
+
+// form submit
 document.getElementById("taskForm").addEventListener("submit", function(e) {
   e.preventDefault();
 
-  const payload = {
-    ref: "main",
-    inputs: {
-      nama: document.getElementById("nama").value,
-      kelas: document.getElementById("kelas").value,
-      jenis: document.getElementById("jenis").value,
-      deskripsi: document.getElementById("deskripsi").value
-    }
+  const task = {
+    nama: document.getElementById("nama").value,
+    kelas: document.getElementById("kelas").value,
+    jenis: document.getElementById("jenis").value,
+    deskripsi: document.getElementById("deskripsi").value,
+    waktu: new Date().toLocaleString()
   };
 
-  fetch("https://api.github.com/repos/YOUR_USERNAME/YOUR_REPO/actions/workflows/submit.yml/dispatches", {
-    method: "POST",
-    headers: {
-      "Accept": "application/vnd.github+json",
-      "Authorization": "Bearer YOUR_GITHUB_PUBLIC_TRIGGER_TOKEN"
-    },
-    body: JSON.stringify(payload)
-  })
-  .then(() => {
-    document.getElementById("status").innerHTML = "Tugas berhasil dikirim!";
-    document.getElementById("taskForm").reset();
-  })
-  .catch(() => {
-    document.getElementById("status").innerHTML = "Terjadi kesalahan. Silakan coba lagi.";
-  });
+  let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+  tasks.push(task);
+  localStorage.setItem("tasks", JSON.stringify(tasks));
+
+  loadTasks();
+  document.getElementById("taskForm").reset();
 });
+
+// render semua tugas
+function loadTasks() {
+  const container = document.getElementById("taskList");
+  container.innerHTML = "";
+
+  let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+
+  tasks.forEach((t, i) => {
+    container.innerHTML += `
+      <div class="bg-blue-50 p-4 rounded-lg shadow-sm border">
+        <p class="font-bold text-blue-800">${t.nama} (Kelas ${t.kelas})</p>
+        <p><b>Tugas:</b> ${t.jenis}</p>
+        <p><b>Deskripsi:</b> ${t.deskripsi}</p>
+        <p class="text-sm text-gray-600 mt-1">Waktu: ${t.waktu}</p>
+        <button onclick="deleteTask(${i})"
+          class="mt-3 bg-red-600 text-white px-3 py-2 rounded-lg hover:bg-red-700 transition">
+          Hapus
+        </button>
+      </div>
+    `;
+  });
+}
+
+function deleteTask(i) {
+  let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+  tasks.splice(i, 1);
+  localStorage.setItem("tasks", JSON.stringify(tasks));
+  loadTasks();
+}
 </script>
 
 </body>
