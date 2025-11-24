@@ -1,456 +1,81 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Laporan Tugas Siswa di Rumah</title>
-  <style>
-    :root {
-      --primary: #2563eb;
-      --border: #e5e7eb;
-      --muted: #6b7280;
-    }
-    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; margin: 0; background: #fafafa; }
-    header { background: #fff; border-bottom: 1px solid var(--border); padding: 16px; }
-    header h1 { margin: 0; font-size: 20px; }
-    main { max-width: 1000px; margin: 24px auto; padding: 0 16px; }
-    .card { background: #fff; border: 1px solid var(--border); border-radius: 10px; padding: 14px; }
-    .grid { display: grid; gap: 16px; }
-    .grid-2 { grid-template-columns: 1fr 1fr; }
-    .grid-3 { grid-template-columns: repeat(3, 1fr); }
-    .toolbar { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 12px; }
-    button, .btn {
-      padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border); background: #fff; cursor: pointer;
-    }
-    .btn-primary { background: var(--primary); color: #fff; border-color: var(--primary); }
-    .btn-ghost { background: #fff; color: #111827; }
-    .badge { display: inline-block; padding: 2px 8px; border: 1px solid var(--border); border-radius: 999px; font-size: 12px; color: #374151; }
-    label { display: block; font-weight: 600; margin-top: 8px; }
-    input, select, textarea {
-      width: 100%; padding: 8px; margin-top: 4px; border: 1px solid var(--border); border-radius: 8px; background: #fff;
-    }
-    textarea { resize: vertical; }
-    ul.items { list-style: none; padding: 0; margin: 0; }
-    ul.items li { border: 1px solid var(--border); border-radius: 10px; padding: 10px; margin-bottom: 8px; background: #fff; }
-    .muted { color: var(--muted); font-size: 13px; }
-    table { width: 100%; border-collapse: collapse; }
-    th, td { border-bottom: 1px solid var(--border); text-align: left; padding: 8px; vertical-align: top; }
-    th { background: #f8fafc; }
-    .pill-tabs { display: flex; gap: 8px; margin-bottom: 12px; }
-    .pill-tabs button { border-radius: 999px; padding: 6px 12px; }
-    .pill-tabs .active { border-color: var(--primary); background: #eff6ff; }
-    .footer-note { margin-top: 8px; font-size: 12px; color: var(--muted); }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pengumpulan Tugas Online</title>
+<style>
+  body { font-family: Arial, sans-serif; background: #f5f5f5; padding: 20px; }
+  .box { max-width: 500px; background: white; margin: auto; padding: 20px; border-radius: 10px; }
+  input, select, textarea { width: 100%; padding: 10px; margin-top: 10px; }
+  button { margin-top: 15px; padding: 12px; width: 100%; background: #0069c0; color: white; border: none; border-radius: 5px; }
+  button:hover { background: #004c8c; cursor: pointer; }
+</style>
 </head>
 <body>
-  <header>
-    <h1>Laporan Tugas Siswa di Rumah</h1>
-    <p class="muted">Murajaah Tahfizh, Mapel Umum, dan Mapel Diniyyah</p>
-  </header>
 
-  <main class="grid">
-    <!-- Daftar tugas -->
-    <section class="card">
-      <h2>Daftar tugas</h2>
-      <div class="pill-tabs" id="categoryTabs"></div>
-      <div class="toolbar">
-        <button id="btnAddTask" class="btn">+ Tambah tugas</button>
-        <button id="btnResetTasks" class="btn-ghost">Reset ke contoh</button>
-      </div>
-      <ul class="items" id="taskList"></ul>
-    </section>
+<div class="box">
+  <h2>Form Pengumpulan Tugas</h2>
 
-    <!-- Form submit jawaban -->
-    <section class="card">
-      <h2>Submit jawaban siswa</h2>
-      <form id="submissionForm" class="grid">
-        <div class="grid-2">
-          <div>
-            <label>Nama siswa</label>
-            <input type="text" id="studentName" placeholder="mis. Ahmad" required />
-          </div>
-          <div>
-            <label>Pilih tugas</label>
-            <select id="taskSelect" required></select>
-          </div>
-        </div>
-        <div>
-          <label>Jawaban tertulis</label>
-          <textarea id="answerText" rows="4" placeholder="tulis ringkasan atau jawaban soal"></textarea>
-        </div>
-        <div class="grid-2">
-          <div>
-            <label>Tautan audio (Tahfizh, opsional)</label>
-            <input type="url" id="audioUrl" placeholder="https://drive.google.com/..." />
-            <p class="footer-note">Masukkan URL audio (contoh: Google Drive). GitHub Pages tidak menerima upload file langsung.</p>
-          </div>
-          <div>
-            <label>Tanggal submit</label>
-            <input type="date" id="submittedDate" />
-            <p class="footer-note">Kosongkan untuk otomatis pakai tanggal hari ini.</p>
-          </div>
-        </div>
-        <div class="toolbar">
-          <button type="submit" class="btn-primary">Submit</button>
-          <button type="button" id="btnClearForm" class="btn">Bersihkan</button>
-        </div>
-      </form>
-    </section>
+  <form id="taskForm">
+    <label>Nama Siswa</label>
+    <input type="text" id="nama" required>
 
-    <!-- Laporan submissions -->
-    <section class="card">
-      <h2>Laporan submissions</h2>
-      <div class="toolbar">
-        <select id="filterTask">
-          <option value="">Filter tugas (semua)</option>
-        </select>
-        <select id="filterCategory">
-          <option value="">Filter kategori (semua)</option>
-          <option value="Tahfizh">Tahfizh</option>
-          <option value="Umum">Umum</option>
-          <option value="Diniyyah">Diniyyah</option>
-        </select>
-        <input type="text" id="filterStudent" placeholder="Cari nama siswa" />
-        <button id="btnExportCsv" class="btn">Export CSV</button>
-        <button id="btnClearData" class="btn-ghost">Hapus semua data</button>
-      </div>
-      <div class="muted" id="reportSummary"></div>
-      <div style="overflow-x:auto; margin-top: 8px;">
-        <table id="reportTable">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Nama siswa</th>
-              <th>Kategori</th>
-              <th>Judul tugas</th>
-              <th>Jawaban</th>
-              <th>Audio</th>
-              <th>Waktu submit</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </div>
-    </section>
-  </main>
+    <label>Kelas</label>
+    <select id="kelas" required>
+      <option value="7">Kelas 7</option>
+      <option value="8">Kelas 8</option>
+      <option value="9">Kelas 9</option>
+    </select>
 
-  <script>
-    // ----- Data store (localStorage) -----
-    const LS_KEYS = {
-      tasks: 'tsr_tasks',
-      submissions: 'tsr_submissions',
-      selectedCategory: 'tsr_selected_category'
-    };
+    <label>Jenis Tugas</label>
+    <select id="jenis" required>
+      <option>Murajaah Tahfizh</option>
+      <option>Murajaah Mapel Diniyyah</option>
+      <option>Murajaah Mapel Umum</option>
+      <option>Membantu Orangtua</option>
+    </select>
 
-    const CATEGORIES = ['Tahfizh', 'Umum', 'Diniyyah'];
+    <label>Deskripsi Tugas</label>
+    <textarea id="deskripsi" rows="4" required></textarea>
 
-    const SAMPLE_TASKS = [
-      { id: 't1', title: 'Murajaah Juz 1', category: 'Tahfizh', description: 'Rekam bacaan QS Al-Fatihah dan awal Al-Baqarah.', dueDate: '2025-12-01' },
-      { id: 't2', title: 'Matematika: Pecahan', category: 'Umum', description: 'Kerjakan 5 soal pecahan di buku halaman 23.', dueDate: '2025-11-28' },
-      { id: 't3', title: 'Fiqh: Thaharah', category: 'Diniyyah', description: 'Ringkas rukun wudhu dalam 5 poin.', dueDate: '2025-11-29' }
-    ];
+    <button type="submit">Kumpulkan Tugas</button>
+  </form>
 
-    function loadTasks() {
-      const raw = localStorage.getItem(LS_KEYS.tasks);
-      if (!raw) {
-        localStorage.setItem(LS_KEYS.tasks, JSON.stringify(SAMPLE_TASKS));
-        return SAMPLE_TASKS.slice();
-      }
-      try { return JSON.parse(raw); } catch { return SAMPLE_TASKS.slice(); }
+  <p id="status"></p>
+</div>
+
+<script>
+document.getElementById("taskForm").addEventListener("submit", function(e) {
+  e.preventDefault();
+
+  const payload = {
+    ref: "main",
+    inputs: {
+      nama: document.getElementById("nama").value,
+      kelas: document.getElementById("kelas").value,
+      jenis: document.getElementById("jenis").value,
+      deskripsi: document.getElementById("deskripsi").value
     }
+  };
 
-    function saveTasks(tasks) {
-      localStorage.setItem(LS_KEYS.tasks, JSON.stringify(tasks));
-    }
+  fetch("https://api.github.com/repos/YOUR_USERNAME/YOUR_REPO/actions/workflows/submit.yml/dispatches", {
+    method: "POST",
+    headers: {
+      "Accept": "application/vnd.github+json",
+      "Authorization": "Bearer YOUR_GITHUB_PUBLIC_TRIGGER_TOKEN"
+    },
+    body: JSON.stringify(payload)
+  })
+  .then(() => {
+    document.getElementById("status").innerHTML = "Tugas berhasil dikirim!";
+    document.getElementById("taskForm").reset();
+  })
+  .catch(() => {
+    document.getElementById("status").innerHTML = "Terjadi kesalahan. Silakan coba lagi.";
+  });
+});
+</script>
 
-    function loadSubmissions() {
-      const raw = localStorage.getItem(LS_KEYS.submissions);
-      if (!raw) { localStorage.setItem(LS_KEYS.submissions, JSON.stringify([])); return []; }
-      try { return JSON.parse(raw); } catch { return []; }
-    }
-
-    function saveSubmissions(subs) {
-      localStorage.setItem(LS_KEYS.submissions, JSON.stringify(subs));
-    }
-
-    // ----- UI elements -----
-    const categoryTabs = document.getElementById('categoryTabs');
-    const taskList = document.getElementById('taskList');
-    const taskSelect = document.getElementById('taskSelect');
-    const btnAddTask = document.getElementById('btnAddTask');
-    const btnResetTasks = document.getElementById('btnResetTasks');
-
-    const submissionForm = document.getElementById('submissionForm');
-    const studentNameInput = document.getElementById('studentName');
-    const answerTextInput = document.getElementById('answerText');
-    const audioUrlInput = document.getElementById('audioUrl');
-    const submittedDateInput = document.getElementById('submittedDate');
-    const btnClearForm = document.getElementById('btnClearForm');
-
-    const filterTask = document.getElementById('filterTask');
-    const filterCategory = document.getElementById('filterCategory');
-    const filterStudent = document.getElementById('filterStudent');
-    const btnExportCsv = document.getElementById('btnExportCsv');
-    const btnClearData = document.getElementById('btnClearData');
-    const reportTableBody = document.querySelector('#reportTable tbody');
-    const reportSummary = document.getElementById('reportSummary');
-
-    // ----- State -----
-    let tasks = loadTasks();
-    let submissions = loadSubmissions();
-    let selectedCategory = localStorage.getItem(LS_KEYS.selectedCategory) || 'Tahfizh';
-
-    // ----- Render helpers -----
-    function renderCategoryTabs() {
-      categoryTabs.innerHTML = '';
-      CATEGORIES.forEach(cat => {
-        const b = document.createElement('button');
-        b.textContent = cat;
-        b.className = 'btn ' + (selectedCategory === cat ? 'active' : '');
-        b.onclick = () => {
-          selectedCategory = cat;
-          localStorage.setItem(LS_KEYS.selectedCategory, cat);
-          renderTasks();
-          renderTaskSelect();
-        };
-        categoryTabs.appendChild(b);
-      });
-    }
-
-    function renderTasks() {
-      const filtered = tasks.filter(t => t.category === selectedCategory);
-      taskList.innerHTML = '';
-      if (filtered.length === 0) {
-        taskList.innerHTML = '<li class="muted">Belum ada tugas pada kategori ini.</li>';
-        return;
-      }
-      filtered.forEach(t => {
-        const li = document.createElement('li');
-        li.innerHTML = `
-          <div style="display:flex;justify-content:space-between;gap:8px;align-items:center;">
-            <div>
-              <strong>${t.title}</strong> <span class="badge">${t.category}</span><br/>
-              <span class="muted">${t.description || ''}</span>
-            </div>
-            <div class="muted">${t.dueDate ? 'Batas: ' + t.dueDate : ''}</div>
-          </div>
-          <div class="toolbar" style="margin-top:8px;">
-            <button class="btn" data-edit="${t.id}">Edit</button>
-            <button class="btn-ghost" data-del="${t.id}">Hapus</button>
-          </div>
-        `;
-        taskList.appendChild(li);
-      });
-
-      // edit & delete handlers
-      taskList.querySelectorAll('button[data-edit]').forEach(btn => {
-        btn.onclick = () => {
-          const id = btn.getAttribute('data-edit');
-          const task = tasks.find(x => x.id === id);
-          if (!task) return;
-          const title = prompt('Judul tugas:', task.title);
-          if (!title) return;
-          const description = prompt('Deskripsi:', task.description || '');
-          const dueDate = prompt('Batas tanggal (YYYY-MM-DD, opsional):', task.dueDate || '');
-          task.title = title;
-          task.description = description || '';
-          task.dueDate = dueDate || '';
-          saveTasks(tasks);
-          renderTasks();
-          renderTaskSelect();
-          renderFilters();
-          renderReport();
-        };
-      });
-      taskList.querySelectorAll('button[data-del]').forEach(btn => {
-        btn.onclick = () => {
-          const id = btn.getAttribute('data-del');
-          if (!confirm('Hapus tugas ini?')) return;
-          tasks = tasks.filter(x => x.id !== id);
-          saveTasks(tasks);
-          renderTasks();
-          renderTaskSelect();
-          renderFilters();
-          renderReport();
-        };
-      });
-    }
-
-    function renderTaskSelect() {
-      taskSelect.innerHTML = '<option value="">-- pilih tugas --</option>';
-      tasks.forEach(t => {
-        const opt = document.createElement('option');
-        opt.value = t.id;
-        opt.textContent = `[${t.category}] ${t.title}`;
-        taskSelect.appendChild(opt);
-      });
-    }
-
-    function renderFilters() {
-      filterTask.innerHTML = '<option value="">Filter tugas (semua)</option>';
-      tasks.forEach(t => {
-        const opt = document.createElement('option');
-        opt.value = t.id;
-        opt.textContent = `[${t.category}] ${t.title}`;
-        filterTask.appendChild(opt);
-      });
-    }
-
-    function renderReport() {
-      const ft = filterTask.value;
-      const fc = filterCategory.value;
-      const fs = filterStudent.value.trim().toLowerCase();
-
-      const subs = submissions.filter(s => {
-        const t = tasks.find(x => x.id === s.taskId);
-        const byTask = ft ? s.taskId === ft : true;
-        const byCat = fc ? (t && t.category === fc) : true;
-        const byName = fs ? s.studentName.toLowerCase().includes(fs) : true;
-        return byTask && byCat && byName;
-      });
-
-      reportSummary.textContent = `${subs.length} submissions ditampilkan`;
-
-      reportTableBody.innerHTML = '';
-      subs.forEach((s, i) => {
-        const t = tasks.find(x => x.id === s.taskId);
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>${i + 1}</td>
-          <td>${s.studentName}</td>
-          <td>${t ? t.category : '-'}</td>
-          <td>${t ? t.title : s.taskId}</td>
-          <td>${s.answerText ? escapeHtml(s.answerText).replace(/\n/g, '<br/>') : '-'}</td>
-          <td>${s.audioUrl ? `<a href="${s.audioUrl}" target="_blank">Buka audio</a>` : '-'}</td>
-          <td>${new Date(s.submittedAt).toLocaleString()}</td>
-        `;
-        reportTableBody.appendChild(tr);
-      });
-    }
-
-    function escapeHtml(str) {
-      const div = document.createElement('div');
-      div.innerText = str;
-      return div.innerHTML;
-    }
-
-    // ----- Events -----
-    btnAddTask.onclick = () => {
-      const title = prompt('Judul tugas:');
-      if (!title) return;
-      const category = prompt('Kategori (Tahfizh/Umum/Diniyyah):', selectedCategory);
-      if (!category || !CATEGORIES.includes(category)) {
-        alert('Kategori tidak valid.');
-        return;
-      }
-      const description = prompt('Deskripsi:', '');
-      const dueDate = prompt('Batas tanggal (YYYY-MM-DD, opsional):', '');
-      const id = 't' + String(Date.now());
-      tasks.push({ id, title, category, description: description || '', dueDate: dueDate || '' });
-      saveTasks(tasks);
-      renderTasks();
-      renderTaskSelect();
-      renderFilters();
-    };
-
-    btnResetTasks.onclick = () => {
-      if (!confirm('Reset daftar tugas ke contoh bawaan?')) return;
-      tasks = SAMPLE_TASKS.slice();
-      saveTasks(tasks);
-      renderTasks();
-      renderTaskSelect();
-      renderFilters();
-      renderReport();
-    };
-
-    btnClearForm.onclick = () => {
-      submissionForm.reset();
-    };
-
-    submissionForm.onsubmit = (e) => {
-      e.preventDefault();
-      const studentName = studentNameInput.value.trim();
-      const taskId = taskSelect.value;
-      if (!studentName || !taskId) {
-        alert('Nama siswa dan pilihan tugas wajib diisi.');
-        return;
-      }
-      const answerText = answerTextInput.value.trim();
-      const audioUrl = audioUrlInput.value.trim();
-      const dateStr = submittedDateInput.value;
-      const submittedAt = dateStr ? new Date(dateStr + 'T00:00:00') : new Date();
-
-      const newSub = {
-        id: 's' + String(Date.now()),
-        studentName,
-        taskId,
-        answerText,
-        audioUrl: audioUrl || '',
-        submittedAt: submittedAt.toISOString()
-      };
-      submissions.push(newSub);
-      saveSubmissions(submissions);
-
-      submissionForm.reset();
-      alert('Berhasil submit!');
-      renderReport();
-    };
-
-    filterTask.onchange = renderReport;
-    filterCategory.onchange = renderReport;
-    filterStudent.oninput = renderReport;
-
-    btnExportCsv.onclick = () => {
-      const rows = [['No', 'Nama siswa', 'Kategori', 'Judul tugas', 'Jawaban', 'Audio URL', 'Waktu submit']];
-      const ft = filterTask.value;
-      const fc = filterCategory.value;
-      const fs = filterStudent.value.trim().toLowerCase();
-
-      const subs = submissions.filter(s => {
-        const t = tasks.find(x => x.id === s.taskId);
-        const byTask = ft ? s.taskId === ft : true;
-        const byCat = fc ? (t && t.category === fc) : true;
-        const byName = fs ? s.studentName.toLowerCase().includes(fs) : true;
-        return byTask && byCat && byName;
-      });
-
-      subs.forEach((s, i) => {
-        const t = tasks.find(x => x.id === s.taskId);
-        rows.push([
-          i + 1,
-          s.studentName,
-          t ? t.category : '',
-          t ? t.title : s.taskId,
-          s.answerText.replace(/\n/g, ' ').replace(/"/g, '""'),
-          s.audioUrl || '',
-          new Date(s.submittedAt).toLocaleString()
-        ]);
-      });
-
-      const csv = rows.map(r => r.map(cell => `"${String(cell)}"`).join(',')).join('\n');
-      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'laporan_tugas_siswa.csv';
-      a.click();
-      URL.revokeObjectURL(url);
-    };
-
-    btnClearData.onclick = () => {
-      if (!confirm('Hapus SEMUA data submissions?')) return;
-      submissions = [];
-      saveSubmissions(submissions);
-      renderReport();
-    };
-
-    // ----- Initialize -----
-    renderCategoryTabs();
-    renderTasks();
-    renderTaskSelect();
-    renderFilters();
-    renderReport();
-  </script>
 </body>
 </html>
-
