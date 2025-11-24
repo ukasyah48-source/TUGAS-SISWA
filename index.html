@@ -1,29 +1,41 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Tugas Harian Siswa</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Aplikasi Tugas Siswa</title>
 <script src="https://cdn.tailwindcss.com"></script>
+
+<style>
+  body {
+    background: linear-gradient(135deg, #cbd5e1, #f1f5f9);
+  }
+  .glass {
+    background: rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+</style>
 </head>
 
-<body class="bg-gray-100">
+<body class="min-h-screen flex justify-center items-start py-10">
 
-<div class="max-w-md mx-auto mt-6 bg-white shadow-xl rounded-xl p-6">
+<div class="w-full max-w-xl glass rounded-2xl shadow-xl p-6">
 
-  <h2 class="text-2xl font-bold text-center mb-4 text-blue-700">Tugas Harian Siswa</h2>
+  <h1 class="text-2xl font-bold text-center text-blue-700 mb-4">
+    Tugas Harian Siswa
+  </h1>
 
   <form id="taskForm" class="space-y-3">
-    
     <div>
       <label class="font-semibold">Nama Siswa</label>
-      <input id="nama" type="text" required 
+      <input id="nama" type="text" required
         class="w-full border rounded-lg p-2 mt-1 focus:ring focus:ring-blue-300">
     </div>
 
     <div>
       <label class="font-semibold">Kelas</label>
-      <select id="kelas" required 
+      <select id="kelas" required
         class="w-full border rounded-lg p-2 mt-1 focus:ring focus:ring-blue-300">
         <option value="7">Kelas 7</option>
         <option value="8">Kelas 8</option>
@@ -33,7 +45,7 @@
 
     <div>
       <label class="font-semibold">Jenis Tugas</label>
-      <select id="jenis" required 
+      <select id="jenis" required
         class="w-full border rounded-lg p-2 mt-1 focus:ring focus:ring-blue-300">
         <option>Murajaah Tahfizh</option>
         <option>Murajaah Mapel Diniyyah</option>
@@ -44,28 +56,27 @@
 
     <div>
       <label class="font-semibold">Deskripsi Tugas</label>
-      <textarea id="deskripsi" rows="3" required 
+      <textarea id="deskripsi" rows="3" required
         class="w-full border rounded-lg p-2 mt-1 focus:ring focus:ring-blue-300"></textarea>
     </div>
 
-    <button type="submit" 
+    <button type="submit"
       class="w-full bg-blue-600 text-white p-3 rounded-lg font-semibold hover:bg-blue-700 transition">
       Simpan Tugas
     </button>
-
   </form>
 
-  <h3 class="text-xl font-bold mt-6 mb-2">Tugas Tersimpan</h3>
-  <div id="taskList" class="space-y-3"></div>
+  <h2 class="text-xl font-bold mt-6">Tugas Tersimpan</h2>
+  <div id="taskList" class="space-y-3 mt-2"></div>
 
 </div>
 
 <script>
-// load data
+// Load tugas saat halaman dibuka
 document.addEventListener("DOMContentLoaded", loadTasks);
 
-// form submit
-document.getElementById("taskForm").addEventListener("submit", function(e) {
+// Proses submit form
+document.getElementById("taskForm").addEventListener("submit", function (e) {
   e.preventDefault();
 
   const task = {
@@ -73,18 +84,19 @@ document.getElementById("taskForm").addEventListener("submit", function(e) {
     kelas: document.getElementById("kelas").value,
     jenis: document.getElementById("jenis").value,
     deskripsi: document.getElementById("deskripsi").value,
-    waktu: new Date().toLocaleString()
+    waktu: new Date().toLocaleString(),
   };
 
   let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
   tasks.push(task);
+
   localStorage.setItem("tasks", JSON.stringify(tasks));
 
   loadTasks();
   document.getElementById("taskForm").reset();
 });
 
-// render semua tugas
+// Menampilkan daftar tugas
 function loadTasks() {
   const container = document.getElementById("taskList");
   container.innerHTML = "";
@@ -93,11 +105,12 @@ function loadTasks() {
 
   tasks.forEach((t, i) => {
     container.innerHTML += `
-      <div class="bg-blue-50 p-4 rounded-lg shadow-sm border">
+      <div class="bg-blue-50 border rounded-xl p-4 shadow">
         <p class="font-bold text-blue-800">${t.nama} (Kelas ${t.kelas})</p>
         <p><b>Tugas:</b> ${t.jenis}</p>
         <p><b>Deskripsi:</b> ${t.deskripsi}</p>
-        <p class="text-sm text-gray-600 mt-1">Waktu: ${t.waktu}</p>
+        <p class="text-sm text-gray-600">Waktu: ${t.waktu}</p>
+
         <button onclick="deleteTask(${i})"
           class="mt-3 bg-red-600 text-white px-3 py-2 rounded-lg hover:bg-red-700 transition">
           Hapus
@@ -107,9 +120,10 @@ function loadTasks() {
   });
 }
 
-function deleteTask(i) {
+// Menghapus tugas
+function deleteTask(index) {
   let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
-  tasks.splice(i, 1);
+  tasks.splice(index, 1);
   localStorage.setItem("tasks", JSON.stringify(tasks));
   loadTasks();
 }
